@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Love Is in the City — Virtual Movie Night</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Courier+Prime:wght@400;700&display=swap');
+
+  :root{
+    --navy:#12213a;
+    --navy-deep:#0a1526;
+    --cream:#f2e9d8;
+    --gold:#d4af5a;
+    --red:#8c2f2f;
+    --paper:#efe6d3;
+  }
+
+  *{box-sizing:border-box;}
+
+  html,body{
+    height:100%;
+    margin:0;
+  }
+
+  body{
+    background:var(--navy-deep);
+    background-image:
+      radial-gradient(circle at 15% 15%, rgba(212,175,90,0.08), transparent 40%),
+      radial-gradient(circle at 85% 85%, rgba(212,175,90,0.06), transparent 40%);
+    font-family:'Courier Prime', monospace;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:22px;
+    padding:24px;
+  }
+
+  .wrap{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:22px;
+    width:640px;
+    max-width:100%;
+  }
+
+  .ticket{
+    width:100%;
+    display:flex;
+    background:var(--paper);
+    border-radius:8px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.5);
+    overflow:hidden;
+    position:relative;
+  }
+
+  .stamp{
+    position:absolute;
+    top:50%;
+    left:38%;
+    transform:translate(-50%,-50%) rotate(-18deg) scale(0.6);
+    font-family:'Bebas Neue', sans-serif;
+    font-size:2.6rem;
+    letter-spacing:0.15em;
+    color:var(--red);
+    border:5px solid var(--red);
+    border-radius:10px;
+    padding:6px 18px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.35s ease, transform 0.35s ease;
+    background:rgba(242,233,216,0.55);
+  }
+  .stamp.show{
+    opacity:0.88;
+    transform:translate(-50%,-50%) rotate(-18deg) scale(1);
+  }
+
+  .booking-panel{
+    width:100%;
+    background:var(--paper);
+    border-radius:8px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.5);
+    padding:22px 28px;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:14px;
+    justify-content:space-between;
+  }
+
+  .booking-panel label{
+    font-size:0.7rem;
+    letter-spacing:0.1em;
+    color:var(--navy);
+    opacity:0.6;
+    display:block;
+    margin-bottom:4px;
+  }
+
+  .booking-panel input[type="datetime-local"]{
+    font-family:'Courier Prime', monospace;
+    font-size:0.85rem;
+    padding:8px 10px;
+    border:1px solid rgba(18,33,58,0.25);
+    border-radius:4px;
+    background:white;
+    color:var(--navy);
+  }
+
+  .book-btn{
+    font-family:'Bebas Neue', sans-serif;
+    letter-spacing:0.12em;
+    font-size:1rem;
+    color:var(--cream);
+    background:var(--navy);
+    border:none;
+    border-radius:4px;
+    padding:14px 26px;
+    cursor:pointer;
+    transition:background 0.2s ease, transform 0.1s ease;
+  }
+  .book-btn:hover{ background:#1a2f52; }
+  .book-btn:active{ transform:scale(0.97); }
+  .book-btn:disabled{
+    background:var(--red);
+    cursor:default;
+  }
+
+  .confirm-msg{
+    width:100%;
+    text-align:center;
+    color:var(--cream);
+    opacity:0;
+    font-size:0.85rem;
+    letter-spacing:0.03em;
+    transition:opacity 0.4s ease;
+    min-height:1.2em;
+  }
+  .confirm-msg.show{ opacity:0.8; }
+
+  .ticket-main{
+    flex:1;
+    padding:34px 34px 28px 34px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(140,47,47,0.05) 28px);
+  }
+
+  .eyebrow{
+    font-family:'Bebas Neue', sans-serif;
+    letter-spacing:0.22em;
+    font-size:0.75rem;
+    color:var(--red);
+  }
+
+  .title{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:2.6rem;
+    letter-spacing:0.02em;
+    color:var(--navy);
+    margin:10px 0 4px 0;
+    line-height:1;
+  }
+
+  .subtitle{
+    font-size:0.8rem;
+    letter-spacing:0.05em;
+    color:var(--red);
+    opacity:0.85;
+    margin-bottom:16px;
+  }
+
+  .desc{
+    font-size:0.9rem;
+    color:var(--navy);
+    opacity:0.8;
+    line-height:1.55;
+    max-width:90%;
+  }
+
+  .distance-line{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:20px 0;
+  }
+
+  .distance-line .dot{
+    width:8px; height:8px;
+    border-radius:50%;
+    background:var(--navy);
+    flex-shrink:0;
+  }
+  .distance-line .line{
+    flex:1;
+    height:1px;
+    background:repeating-linear-gradient(90deg, var(--navy) 0 4px, transparent 4px 8px);
+    opacity:0.5;
+  }
+  .distance-line span.city{
+    font-size:0.72rem;
+    letter-spacing:0.1em;
+    color:var(--navy);
+    opacity:0.65;
+    white-space:nowrap;
+  }
+
+  .meta{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    margin-top:10px;
+    font-size:0.7rem;
+    letter-spacing:0.08em;
+    color:var(--navy);
+    opacity:0.55;
+  }
+
+  .stub{
+    width:150px;
+    flex-shrink:0;
+    background:var(--navy);
+    color:var(--gold);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:16px;
+    position:relative;
+    border-left:2px dashed var(--gold);
+    padding:20px 0;
+  }
+
+  .stub::before, .stub::after{
+    content:"";
+    position:absolute;
+    left:-9px;
+    width:18px;
+    height:18px;
+    background:var(--navy-deep);
+    border-radius:50%;
+  }
+  .stub::before{ top:-9px; }
+  .stub::after{ bottom:-9px; }
+
+  .stub-label{
+    writing-mode:vertical-rl;
+    transform:rotate(180deg);
+    font-family:'Bebas Neue', sans-serif;
+    letter-spacing:0.22em;
+    font-size:1.1rem;
+  }
+
+  .stub-icon{
+    font-size:1.4rem;
+    opacity:0.85;
+  }
+
+  .stub-num{
+    font-family:'Bebas Neue', sans-serif;
+    font-size:0.8rem;
+    color:var(--cream);
+    opacity:0.7;
+  }
+
+  @media (max-width:500px){
+    .ticket{ flex-direction:column; }
+    .stub{
+      flex-direction:row;
+      width:100%;
+      border-left:none;
+      border-top:2px dashed var(--gold);
+      padding:14px 0;
+    }
+    .stub::before, .stub::after{ left:auto; top:-9px; }
+    .stub::before{ left:-9px; }
+    .stub::after{ right:-9px; }
+    .stub-label{
+      writing-mode:horizontal-tb;
+      transform:none;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="wrap">
+
+    <div class="ticket" id="ticket">
+      <div class="ticket-main">
+        <div>
+          <div class="eyebrow">ADMIT ONE — VIRTUAL SCREENING</div>
+          <div class="title">Love Is in<br>the City</div>
+          <div class="subtitle">a movie night, redeemed together, apart</div>
+
+          <div class="distance-line">
+            <span class="city">MY SCREEN</span>
+            <span class="dot"></span>
+            <span class="line"></span>
+            <span class="dot"></span>
+            <span class="city">YOUR SCREEN</span>
+          </div>
+
+          <div class="desc">
+            One call, two screens, same movie. Redeemable whenever you miss me most —
+            I'll press play the second you say go.
+          </div>
+        </div>
+        <div class="meta"><span id="showtimeLabel">SHOWTIME: TBD</span><span>SEATS: LONG DISTANCE</span></div>
+      </div>
+      <div class="stub">
+        <div class="stub-icon">&#127916;</div>
+        <div class="stub-label">COUPON</div>
+        <div class="stub-num">No. 01</div>
+      </div>
+      <div class="stamp" id="stamp">BOOKED</div>
+    </div>
+
+    <div class="booking-panel">
+      <div>
+        <label for="showtime">PICK A SHOWTIME (OPTIONAL)</label>
+        <input type="datetime-local" id="showtime">
+      </div>
+      <button class="book-btn" id="bookBtn" onclick="bookIt()">Press &amp; Book</button>
+      <div class="confirm-msg" id="confirmMsg"></div>
+    </div>
+
+  </div>
+
+  <script>
+    function bookIt(){
+      const btn = document.getElementById('bookBtn');
+      const stamp = document.getElementById('stamp');
+      const msg = document.getElementById('confirmMsg');
+      const showtimeInput = document.getElementById('showtime');
+      const showtimeLabel = document.getElementById('showtimeLabel');
+
+      if(showtimeInput.value){
+        const d = new Date(showtimeInput.value);
+        const formatted = d.toLocaleString(undefined, {
+          weekday: 'short', month: 'short', day: 'numeric',
+          hour: 'numeric', minute: '2-digit'
+        });
+        showtimeLabel.textContent = 'SHOWTIME: ' + formatted;
+      }
+
+      stamp.classList.add('show');
+      btn.textContent = 'Booked ✓';
+      btn.disabled = true;
+      msg.textContent = "It's a date — see you on screen.";
+      msg.classList.add('show');
+    }
+  </script>
+
+</body>
+</html>
